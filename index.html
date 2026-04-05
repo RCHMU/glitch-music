@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soothing Sounds - Relax Your Mind</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            overflow: hidden;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ====================== INTRO SCREEN ====================== */
+        #intro-screen {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #1a0033, #000);
+            position: relative;
+        }
+
+        #intro-text {
+            font-size: 3.2rem;
+            letter-spacing: 8px;
+            opacity: 1;
+            transition: opacity 1.2s ease;
+            text-shadow: 0 0 20px rgba(255, 0, 100, 0.8);
+        }
+
+        #volume-check {
+            margin-top: 40px;
+            width: 100%;
+            max-width: 420px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(255, 0, 100, 0.6);
+            text-align: center;
+        }
+
+        #skip-btn {
+            margin-top: 25px;
+            padding: 15px 40px;
+            background: transparent;
+            border: 3px solid #ff0066;
+            color: #ff0066;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s;
+            opacity: 0;
+        }
+
+        #skip-btn:hover {
+            background: #ff0066;
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 0 30px #ff3366;
+        }
+
+        /* ====================== MAIN WEBSITE ====================== */
+        #main-website {
+            height: 100vh;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #horror-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4a0000, #110000);
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(180, 0, 20, 0.75) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(200, 0, 30, 0.65) 0%, transparent 45%),
+                radial-gradient(circle at 40% 80%, rgba(150, 0, 10, 0.8) 0%, transparent 35%);
+            z-index: 6;
+            pointer-events: none;
+            mask-image: radial-gradient(circle 220px at var(--cursor-x) var(--cursor-y), black 25%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle 220px at var(--cursor-x) var(--cursor-y), black 25%, transparent 75%);
+            opacity: 0.94;
+            transition: opacity 0.3s ease;
+        }
+
+        #flashlight {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle 170px at var(--cursor-x) var(--cursor-y), transparent 0%, rgba(255,255,255,0.12) 100%);
+            z-index: 7;
+            mix-blend-mode: screen;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 680px;
+            padding: 40px;
+            background: rgba(255,255,255,0.85);
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        h2 { font-size: 2.8rem; color: #222; margin-bottom: 10px; text-shadow: 0 0 10px #a8edea; }
+        p { font-size: 1.3rem; color: #444; margin-bottom: 30px; }
+
+        .player {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .track-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .track {
+            display: flex;
+            align-items: center;
+            padding: 12px 18px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .track:hover { background: #e0f0ff; transform: translateX(8px); }
+
+        .fake-progress {
+            height: 8px;
+            background: #ddd;
+            border-radius: 10px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .fake-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 65%;
+            background: linear-gradient(90deg, #00ffcc, #ff0066);
+            animation: progressMove 4s linear infinite;
+        }
+        @keyframes progressMove { 0% { width: 0%; } 100% { width: 100%; } }
+
+        #play-btn {
+            padding: 18px 50px;
+            font-size: 1.4rem;
+            background: linear-gradient(90deg, #00ffcc, #ff0066);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 15px 30px rgba(255, 0, 102, 0.4);
+            transition: all 0.4s ease;
+        }
+        #play-btn:hover {
+            transform: scale(1.12) rotate(3deg);
+            box-shadow: 0 20px 40px rgba(255, 0, 102, 0.6);
+        }
+
+        #subtle-text {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-size: 1.4rem;
+            color: #ff2222;
+            text-shadow: 0 0 15px #ff0000;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 20;
+            transition: opacity 0.6s ease;
+            font-weight: bold;
+        }
+
+        /* ====================== JUMPSCARE ====================== */
+        #jumpscare {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #scary-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: intenseGlitch 0.1s infinite alternate;
+        }
+
+        @keyframes intenseGlitch {
+            0% { transform: translate(0) scale(1); filter: invert(0) hue-rotate(0deg) brightness(1); }
+            10% { transform: translate(-25px, 18px) scale(1.1); filter: invert(1) hue-rotate(220deg) brightness(2.2); }
+            20% { transform: translate(28px, -18px) scale(0.9); filter: contrast(300%) hue-rotate(110deg); }
+            30% { transform: translate(-22px, 30px) scale(1.15); filter: invert(0) brightness(0.4); }
+            40% { transform: translate(32px, -15px) scale(1); filter: contrast(240%) hue-rotate(320deg); }
+            50% { transform: translate(-12px, 22px) scale(1.12); filter: invert(1); }
+            60% { transform: translate(25px, -28px) scale(0.88); filter: brightness(2.8); }
+            70% { transform: translate(-30px, 15px) scale(1.18); filter: contrast(350%); }
+            80% { transform: translate(15px, -22px) scale(1); filter: invert(0); }
+            90% { transform: translate(-10px, 28px) scale(1.08); filter: hue-rotate(160deg); }
+            100% { transform: translate(0) scale(1); filter: invert(1) brightness(1); }
+        }
+
+        .screen-glitch {
+            animation: screenFlicker 0.3s forwards;
+        }
+
+        @keyframes screenFlicker {
+            0% { filter: brightness(1) contrast(1); transform: translate(0); }
+            15% { filter: brightness(3) contrast(3.5); transform: translate(-8px, 10px); }
+            35% { filter: brightness(0.2) invert(1); transform: translate(12px, -12px); }
+            55% { filter: brightness(4) contrast(2.5); transform: translate(-10px, 8px); }
+            75% { filter: brightness(0.3); transform: translate(9px, -9px); }
+            100% { filter: brightness(1) contrast(1); transform: translate(0); }
+        }
+
+        @media (max-width: 768px) {
+            #intro-text { font-size: 2.4rem; }
+            .content { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- INTRO -->
+    <div id="intro-screen">
+        <h1 id="intro-text"></h1>
+       
+        <div id="volume-check" class="hidden">
+            <p style="font-size:1.35rem; margin-bottom:25px; color:#ffdddd;">
+                Sound උපරිමෙටම වැඩිකරගෙන බලන්න...<br>
+                <span style="font-size:1.1rem;">එතකොට තමයි සැබෑ අත්දැකීම ඔබට දැනෙන්නේ...</span>
+            </p>
+            <button id="skip-btn">Skip Intro (අවදානම්!)</button>
+        </div>
+    </div>
+
+    <!-- MAIN WEBSITE -->
+    <div id="main-website" class="hidden">
+        <div id="horror-layer"></div>
+        <div id="flashlight"></div>
+       
+        <div class="content">
+            <h2>🌿 Soothing Sounds</h2>
+            <p>Listen to the most peaceful audio tracks ever created.</p>
+            
+            <div class="player">
+                <div class="track-list">
+                    <div class="track"><span>🌧️ Rain on Window</span></div>
+                    <div class="track"><span>🌊 Ocean Waves</span></div>
+                    <div class="track"><span>🍃 Gentle Forest</span></div>
+                    <div class="track"><span>🔥 Cozy Fireplace</span></div>
+                </div>
+                
+                <div class="fake-progress"></div>
+                
+                <button id="play-btn">▶ Play Now 🎵</button>
+            </div>
+            
+            <p style="margin-top:20px; font-size:1rem; color:#666;">Volume auto-adjusted for your device</p>
+        </div>
+
+        <div id="subtle-text"></div>
+    </div>
+
+    <!-- JUMPSCARE -->
+    <div id="jumpscare" class="hidden">
+        <img src="scary-face.jpg" alt="Scary Face" id="scary-img">
+    </div>
+
+    <!-- Audio -->
+    <audio id="creepy-whisper" src="whisper.mp3" loop></audio>
+    <audio id="scream-sound" src="scream.mp3"></audio>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const introText = document.getElementById("intro-text");
+            const introScreen = document.getElementById("intro-screen");
+            const volumeCheck = document.getElementById("volume-check");
+            const skipBtn = document.getElementById("skip-btn");
+            const mainWebsite = document.getElementById("main-website");
+            const flashlight = document.getElementById("flashlight");
+            const horrorLayer = document.getElementById("horror-layer");
+            const playBtn = document.getElementById("play-btn");
+            const jumpscare = document.getElementById("jumpscare");
+            const subtleText = document.getElementById("subtle-text");
+            
+            const whisperSound = document.getElementById("creepy-whisper");
+            const screamSound = document.getElementById("scream-sound");
+
+            let isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+            let horrorIntensity = 1;
+            let randomJumpscareActive = true;
+
+            const baseWhisperVol = isMobile ? 0.18 : 0.25;
+
+            // ====================== INTRO SEQUENCE ======================
+            setTimeout(() => { introText.innerText = "හලෝ..."; }, 800);
+
+            setTimeout(() => {
+                introText.style.opacity = 0;
+                setTimeout(() => {
+                    introText.innerText = "ඔබව සාදරයෙන් පිළිගන්නවා...";
+                    introText.style.opacity = 1;
+                }, 1100);
+            }, 3200);
+
+            setTimeout(() => {
+                introText.style.opacity = 0;
+                setTimeout(() => {
+                    introText.style.display = "none";
+                    volumeCheck.classList.remove("hidden");
+                    setTimeout(() => { 
+                        skipBtn.style.opacity = 1; 
+                    }, 1500);
+                }, 1100);
+            }, 6800);
+
+            // ====================== SKIP INTRO BUTTON ======================
+            skipBtn.addEventListener("click", () => {
+                introScreen.classList.add("hidden");
+                mainWebsite.classList.remove("hidden");
+                startHorrorFeatures();
+            });
+
+            // ====================== HORROR FEATURES ======================
+            function startHorrorFeatures() {
+                whisperSound.volume = baseWhisperVol;
+                whisperSound.play().catch(() => {});
+
+                function updateCursor(e) {
+                    const x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+                    const y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+                    flashlight.style.setProperty("--cursor-x", `${x}px`);
+                    flashlight.style.setProperty("--cursor-y", `${y}px`);
+                    horrorLayer.style.setProperty("--cursor-x", `${x}px`);
+                    horrorLayer.style.setProperty("--cursor-y", `${y}px`);
+                }
+
+                document.addEventListener("mousemove", updateCursor);
+                document.addEventListener("touchmove", updateCursor, { passive: true });
+
+                const contentElements = document.querySelectorAll('.content, .track, #play-btn');
+                contentElements.forEach(el => {
+                    el.addEventListener("mouseenter", () => {
+                        if (Math.random() > 0.45) {
+                            whisperSound.volume = baseWhisperVol + 0.5;
+                            whisperSound.currentTime = Math.random() * 3;
+                            whisperSound.play();
+                            setTimeout(() => whisperSound.volume = baseWhisperVol * horrorIntensity, 650);
+                        }
+                        el.classList.add("screen-glitch");
+                        setTimeout(() => el.classList.remove("screen-glitch"), 350);
+                    });
+                });
+
+                // Random flickers
+                setInterval(() => {
+                    if (Math.random() > 0.25) {
+                        mainWebsite.classList.add("screen-glitch");
+                        mainWebsite.style.filter = "contrast(250%) brightness(1.5) hue-rotate(25deg)";
+                        setTimeout(() => {
+                            mainWebsite.classList.remove("screen-glitch");
+                            mainWebsite.style.filter = "";
+                        }, 280);
+                    }
+                }, 3800);
+
+                // Creepy subtle texts
+                const creepyMessages = [
+                    "ඔයා පිටුපසින් ඉන්නවා...",
+                    "එය නවත්තන්නේ නැහැ",
+                    "ඔයා බලනවා... එයත් බලනවා",
+                    "ඔබේ නම මම දන්නවා",
+                    "ඔබේ හුස්ම ඇහෙනවා",
+                    "එක දෙයක් කියන්න ඕනේ...",
+                    "ඔයාට ඇහෙනවද?",
+                    "එය ඔයාගේ ඇස් ඇතුළට බලනවා",
+                    "නවත්තන්න බැහැ... එය දැනගෙන ඉන්නවා"
+                ];
+
+                setInterval(() => {
+                    if (Math.random() > 0.55) {
+                        subtleText.textContent = creepyMessages[Math.floor(Math.random() * creepyMessages.length)];
+                        subtleText.style.opacity = "0.95";
+                        setTimeout(() => { subtleText.style.opacity = "0"; }, 1700);
+                    }
+                }, 6200);
+
+                // Horror layer flicker
+                setInterval(() => {
+                    if (Math.random() > 0.35) {
+                        horrorLayer.style.opacity = horrorIntensity > 1 ? "0.35" : "0.2";
+                        setTimeout(() => { horrorLayer.style.opacity = "0.94"; }, 200);
+                    }
+                }, 8200);
+
+                // Random Jumpscare
+                setInterval(() => {
+                    if (!randomJumpscareActive) return;
+                    if (Math.random() < 0.14) {
+                        triggerRandomJumpscare();
+                    }
+                }, 32000);
+            }
+
+            function triggerRandomJumpscare() {
+                whisperSound.pause();
+                randomJumpscareActive = false;
+
+                jumpscare.classList.remove("hidden");
+                screamSound.volume = 0.85;
+                screamSound.currentTime = 0;
+                screamSound.play();
+
+                setTimeout(() => {
+                    jumpscare.classList.add("hidden");
+                    whisperSound.play();
+                    randomJumpscareActive = true;
+
+                    horrorIntensity = Math.min(horrorIntensity + 0.4, 2.2);
+                    whisperSound.volume = Math.min(baseWhisperVol * horrorIntensity, 1.0);
+                    
+                    mainWebsite.style.transition = "background 2s ease";
+                    mainWebsite.style.background = "linear-gradient(135deg, #550000, #110000)";
+                }, 1350);
+            }
+
+            // Main Play Button Jumpscare
+            playBtn.addEventListener("click", () => {
+                whisperSound.pause();
+                randomJumpscareActive = false;
+
+                jumpscare.classList.remove("hidden");
+                screamSound.volume = 1.0;
+                screamSound.currentTime = 0;
+                screamSound.play();
+
+                setTimeout(() => {
+                    jumpscare.classList.add("hidden");
+                    
+                    mainWebsite.style.transition = "background 1.8s ease";
+                    mainWebsite.style.background = "linear-gradient(135deg, #660000, #220000)";
+                    
+                    horrorIntensity = Math.min(horrorIntensity + 0.7, 2.5);
+                    whisperSound.volume = Math.min(baseWhisperVol * horrorIntensity, 1.0);
+                    whisperSound.play();
+                    randomJumpscareActive = true;
+
+                    setInterval(() => {
+                        if (Math.random() > 0.3) {
+                            mainWebsite.classList.add("screen-glitch");
+                            setTimeout(() => mainWebsite.classList.remove("screen-glitch"), 220);
+                        }
+                    }, 2100);
+                }, 2400);
+            });
+
+            console.log("%c✅ Intro එකේ Volume Slider ඉවත් කළා. Skip Intro button එකෙන්ම main page එකට යනවා!", "color:#ff0066; font-size:20px;");
+        });
+    </script>
+</body>
+</html>
